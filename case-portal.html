@@ -3,383 +3,188 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Case Portal with Status Management</title>
+<title>UK Arrest Report Form</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f9f9f9;
-    margin: 0; padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 30px 20px;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
   }
-  .container {
+  form {
     background: white;
-    margin: 50px 0;
-    padding: 30px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 650px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    padding: 25px 30px;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.1);
   }
   h2 {
-    margin-bottom: 20px;
-    color: #222;
     text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #222;
   }
   label {
     display: block;
-    margin-top: 15px;
+    margin-top: 18px;
     font-weight: 600;
     color: #333;
   }
-  input[type="text"], input[type="password"] {
+  input[type="text"], textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px 10px;
     margin-top: 6px;
-    border: 1px solid #ccc;
     border-radius: 6px;
-    font-size: 16px;
-    box-sizing: border-box;
+    border: 1.8px solid #ccc;
+    font-size: 15px;
+    font-family: 'Montserrat', sans-serif;
+    resize: vertical;
+  }
+  textarea {
+    min-height: 80px;
   }
   button {
-    margin-top: 25px;
-    width: 100%;
-    background-color: #0066ff;
-    color: white;
+    margin-top: 28px;
+    background-color: #0070f3;
     border: none;
-    border-radius: 8px;
-    font-weight: 700;
+    color: white;
     font-size: 18px;
-    cursor: pointer;
+    font-weight: 700;
     padding: 14px;
+    border-radius: 10px;
+    width: 100%;
+    cursor: pointer;
     transition: background-color 0.3s ease;
   }
   button:hover {
-    background-color: #004ecc;
+    background-color: #005bb5;
+  }
+  .message {
+    margin-top: 18px;
+    font-weight: 600;
+    text-align: center;
   }
   .error {
-    color: red;
-    margin-top: 15px;
-    text-align: center;
-    font-weight: 600;
+    color: #d93025;
   }
-  .case-list {
-    list-style: none;
-    padding: 0;
-    margin-top: 20px;
-  }
-  .case-list li {
-    margin-bottom: 12px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .case-list a {
-    color: #0066ff;
-    text-decoration: none;
-    font-weight: 600;
-    cursor: pointer;
-    flex-grow: 1;
-  }
-  .case-list a:hover {
-    text-decoration: underline;
-  }
-  .status-select {
-    min-width: 160px;
-    font-weight: 600;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    padding: 6px;
-    cursor: pointer;
-  }
-  .status-New {
-    background-color: #ffcc00;
-    color: #333;
-  }
-  .status-Authorised {
-    background-color: #4CAF50;
-    color: white;
-  }
-  .status-Pending {
-    background-color: #2196F3;
-    color: white;
-  }
-  .status-Denied {
-    background-color: #f44336;
-    color: white;
-  }
-  .logout-btn {
-    background-color: #d33;
-    margin-top: 25px;
-  }
-  #addUserForm {
-    margin-top: 30px;
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
-  }
-  #addUserForm label {
-    margin-top: 0;
-  }
-  #addUserSuccess {
-    color: green;
-    font-weight: 600;
-    margin-top: 10px;
-    text-align: center;
+  .success {
+    color: #188038;
   }
 </style>
 </head>
 <body>
 
-<div class="container">
+<form id="arrestForm">
+  <h2>UK Arrest Report Form</h2>
 
-  <div id="loginBox">
-    <h2>Case Portal Login</h2>
-    <form id="loginForm">
-      <label for="username">Username</label>
-      <input id="username" name="username" type="text" required autocomplete="off" />
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" required autocomplete="off" />
-      <button type="submit">Login</button>
-    </form>
-    <div id="loginError" class="error" style="display:none;"></div>
-  </div>
+  <label for="suspectName">Suspect Full Name</label>
+  <input id="suspectName" name="suspectName" type="text" required autocomplete="off" />
 
-  <div id="caseBox" style="display:none;">
-    <h2>All Cases</h2>
-    <ul id="casesList" class="case-list"></ul>
+  <label for="dob">Date of Birth</label>
+  <input id="dob" name="dob" type="text" placeholder="DD/MM/YYYY" required autocomplete="off" />
 
-    <!-- Add User form only for admin -->
-    <div id="addUserSection" style="display:none;">
-      <h3>Add New User</h3>
-      <form id="addUserForm">
-        <label for="newUsername">New Username</label>
-        <input id="newUsername" name="newUsername" type="text" required autocomplete="off" />
-        <label for="newPassword">New Password</label>
-        <input id="newPassword" name="newPassword" type="password" required autocomplete="off" />
-        <button type="submit">Add User</button>
-      </form>
-      <div id="addUserSuccess" style="display:none;">User added successfully!</div>
-    </div>
+  <label for="address">Address</label>
+  <textarea id="address" name="address" required></textarea>
 
-    <button id="logoutBtn" class="logout-btn">Logout</button>
-  </div>
+  <label for="officerName">Arresting Officer Name</label>
+  <input id="officerName" name="officerName" type="text" required autocomplete="off" />
 
-</div>
+  <label for="incidentDetails">Incident Details</label>
+  <textarea id="incidentDetails" name="incidentDetails" required></textarea>
+
+  <label for="necessities">Necessities for Arrest</label>
+  <textarea id="necessities" name="necessities" required></textarea>
+
+  <button type="submit">Submit Report</button>
+  <div id="message" class="message"></div>
+</form>
 
 <script>
-  const ADMIN_USERNAME = "cfletcher";
-  const ADMIN_PASSWORD = "HiLLonden1!!";
+  const form = document.getElementById('arrestForm');
+  const messageDiv = document.getElementById('message');
 
-  // Status options list & their class names for color coding
-  const STATUS_OPTIONS = [
-    {value: "New", className: "status-New"},
-    {value: "Authorised", className: "status-Authorised"},
-    {value: "Pending Investigation", className: "status-Pending"},
-    {value: "Denied", className: "status-Denied"},
-  ];
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    messageDiv.textContent = '';
+    messageDiv.className = 'message';
 
-  // Load users from localStorage or initialize admin user
-  function loadUsers() {
-    let users = JSON.parse(localStorage.getItem("users"));
-    if (!users) {
-      users = {};
-      users[ADMIN_USERNAME] = ADMIN_PASSWORD;
-      localStorage.setItem("users", JSON.stringify(users));
-    }
-    return users;
-  }
-  function saveUsers(users) {
-    localStorage.setItem("users", JSON.stringify(users));
-  }
+    // Get form values
+    const suspectName = form.suspectName.value.trim();
+    const dob = form.dob.value.trim();
+    const address = form.address.value.trim();
+    const officerName = form.officerName.value.trim();
+    const incidentDetails = form.incidentDetails.value.trim();
+    const necessities = form.necessities.value.trim();
 
-  // Load cases and their statuses
-  function loadCases() {
-    let cases = JSON.parse(localStorage.getItem("cases"));
-    if (!cases) {
-      cases = {};
-      localStorage.setItem("cases", JSON.stringify(cases));
-    }
-    return cases;
-  }
-  function saveCases(cases) {
-    localStorage.setItem("cases", JSON.stringify(cases));
-  }
-
-  const loginBox = document.getElementById("loginBox");
-  const caseBox = document.getElementById("caseBox");
-  const loginError = document.getElementById("loginError");
-  const loginForm = document.getElementById("loginForm");
-  const casesList = document.getElementById("casesList");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const addUserSection = document.getElementById("addUserSection");
-  const addUserForm = document.getElementById("addUserForm");
-  const addUserSuccess = document.getElementById("addUserSuccess");
-
-  let currentUser = null;
-
-  // Check if logged in
-  function checkLogin() {
-    const user = localStorage.getItem("loggedInUser");
-    if (user) {
-      currentUser = user;
-      return true;
-    }
-    return false;
-  }
-
-  // Render all cases with status dropdown
-  function renderCases() {
-    casesList.innerHTML = "";
-    const cases = loadCases();
-
-    const keys = Object.keys(cases);
-    if (keys.length === 0) {
-      casesList.innerHTML = "<li>No cases found.</li>";
+    // Basic validation (already done by 'required' but extra safety)
+    if (!suspectName || !dob || !address || !officerName || !incidentDetails || !necessities) {
+      messageDiv.textContent = 'Please fill out all fields.';
+      messageDiv.classList.add('error');
       return;
     }
 
-    keys.forEach(key => {
-      const caseData = cases[key];
-      // caseData should be { html: "...", status: "New" }
-      const reportHTML = caseData.html;
-      const status = caseData.status || "New";
-
-      // Extract suspect name from HTML title
-      const nameMatch = reportHTML.match(/<title>Arrest Report - (.*?)<\/title>/i);
-      const suspectName = nameMatch ? nameMatch[1] : "Unknown Suspect";
-
-      const li = document.createElement("li");
-
-      // Link to view case in new tab
-      const a = document.createElement("a");
-      a.textContent = `View Case: ${suspectName}`;
-      a.href = "#";
-      a.onclick = () => {
-        const blob = new Blob([reportHTML], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
-        return false;
-      };
-
-      // Status dropdown
-      const select = document.createElement("select");
-      select.className = "status-select";
-
-      STATUS_OPTIONS.forEach(opt => {
-        const option = document.createElement("option");
-        option.value = opt.value;
-        option.textContent = opt.value;
-        if (opt.value === status) option.selected = true;
-        select.appendChild(option);
-      });
-
-      // Set status select color class
-      function updateSelectClass() {
-        STATUS_OPTIONS.forEach(opt => {
-          select.classList.remove(opt.className);
-        });
-        const found = STATUS_OPTIONS.find(o => o.value === select.value);
-        if (found) select.classList.add(found.className);
-      }
-      updateSelectClass();
-
-      // When status changes, update storage
-      select.addEventListener("change", () => {
-        const newStatus = select.value;
-        cases[key].status = newStatus;
-        saveCases(cases);
-        updateSelectClass();
-      });
-
-      li.appendChild(a);
-      li.appendChild(select);
-      casesList.appendChild(li);
-    });
+    // Create full HTML report string (so it can be viewed standalone)
+    const reportHTML = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Arrest Report - ${suspectName}</title>
+<style>
+  body { font-family: 'Montserrat', sans-serif; padding: 30px; background: #f8f9fa; }
+  h1 { color: #0070f3; }
+  section { margin-bottom: 18px; }
+  strong { color: #444; }
+  pre {
+    white-space: pre-wrap;
+    background: #eaeaea;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.4;
   }
+</style>
+</head>
+<body>
+  <h1>UK Arrest Report</h1>
+  <section><strong>Suspect Name:</strong> ${suspectName}</section>
+  <section><strong>Date of Birth:</strong> ${dob}</section>
+  <section><strong>Address:</strong><pre>${address}</pre></section>
+  <section><strong>Arresting Officer:</strong> ${officerName}</section>
+  <section><strong>Incident Details:</strong><pre>${incidentDetails}</pre></section>
+  <section><strong>Necessities for Arrest:</strong><pre>${necessities}</pre></section>
+</body>
+</html>
+    `.trim();
 
-  // Handle login submit
-  loginForm.addEventListener("submit", e => {
-    e.preventDefault();
-    loginError.style.display = "none";
+    // Load cases from localStorage or create new
+    const cases = JSON.parse(localStorage.getItem('cases')) || {};
 
-    const username = e.target.username.value.trim();
-    const password = e.target.password.value.trim();
+    // Generate unique case ID using timestamp + random suffix
+    const caseId = 'case-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 
-    const users = loadUsers();
+    // Save new case with default status "New"
+    cases[caseId] = {
+      html: reportHTML,
+      status: "New",
+      createdAt: new Date().toISOString()
+    };
 
-    if (users[username] && users[username] === password) {
-      currentUser = username;
-      localStorage.setItem("loggedInUser", username);
-      loginBox.style.display = "none";
-      caseBox.style.display = "block";
-      renderCases();
+    localStorage.setItem('cases', JSON.stringify(cases));
 
-      if (username === ADMIN_USERNAME) {
-        addUserSection.style.display = "block";
-      } else {
-        addUserSection.style.display = "none";
-      }
-    } else {
-      loginError.textContent = "Invalid username or password.";
-      loginError.style.display = "block";
-    }
-  });
+    // Show success message, then redirect to case portal
+    messageDiv.textContent = 'Report saved successfully! Redirecting to Case Portal...';
+    messageDiv.classList.add('success');
 
-  // Handle logout
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("loggedInUser");
-    currentUser = null;
-    caseBox.style.display = "none";
-    loginBox.style.display = "block";
-    loginForm.reset();
-    loginError.style.display = "none";
-  });
-
-  // Handle add user form submit
-  addUserForm.addEventListener("submit", e => {
-    e.preventDefault();
-    addUserSuccess.style.display = "none";
-
-    const newUsername = e.target.newUsername.value.trim();
-    const newPassword = e.target.newPassword.value.trim();
-
-    if (!newUsername || !newPassword) return;
-
-    const users = loadUsers();
-    if (users[newUsername]) {
-      alert("User already exists!");
-      return;
-    }
-    users[newUsername] = newPassword;
-    saveUsers(users);
-
-    addUserSuccess.style.display = "block";
-    addUserForm.reset();
-
-    // Hide success message after 3 seconds
     setTimeout(() => {
-      addUserSuccess.style.display = "none";
-    }, 3000);
+      window.location.href = 'case-portal.html';
+    }, 1800);
   });
-
-  // On page load, check login state
-  window.onload = () => {
-    if (checkLogin()) {
-      loginBox.style.display = "none";
-      caseBox.style.display = "block";
-      renderCases();
-
-      if (currentUser === ADMIN_USERNAME) {
-        addUserSection.style.display = "block";
-      } else {
-        addUserSection.style.display = "none";
-      }
-    }
-  };
 </script>
 
 </body>
