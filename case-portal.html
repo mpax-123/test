@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Case Portal with User Management</title>
+<title>Case Portal with Status Management</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,7 +20,7 @@
     padding: 30px;
     border-radius: 10px;
     width: 90%;
-    max-width: 600px;
+    max-width: 650px;
     box-shadow: 0 3px 15px rgba(0,0,0,0.1);
   }
   h2 {
@@ -71,22 +71,50 @@
     margin-top: 20px;
   }
   .case-list li {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .case-list a {
     color: #0066ff;
     text-decoration: none;
     font-weight: 600;
     cursor: pointer;
+    flex-grow: 1;
   }
   .case-list a:hover {
     text-decoration: underline;
   }
+  .status-select {
+    min-width: 160px;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 6px;
+    cursor: pointer;
+  }
+  .status-New {
+    background-color: #ffcc00;
+    color: #333;
+  }
+  .status-Authorised {
+    background-color: #4CAF50;
+    color: white;
+  }
+  .status-Pending {
+    background-color: #2196F3;
+    color: white;
+  }
+  .status-Denied {
+    background-color: #f44336;
+    color: white;
+  }
   .logout-btn {
     background-color: #d33;
-    margin-top: 15px;
+    margin-top: 25px;
   }
   #addUserForm {
     margin-top: 30px;
@@ -124,7 +152,7 @@
     <h2>All Cases</h2>
     <ul id="casesList" class="case-list"></ul>
 
-    <!-- Add User form only for cfletcher -->
+    <!-- Add User form only for admin -->
     <div id="addUserSection" style="display:none;">
       <h3>Add New User</h3>
       <form id="addUserForm">
@@ -143,11 +171,18 @@
 </div>
 
 <script>
-  // Initial admin user
   const ADMIN_USERNAME = "cfletcher";
   const ADMIN_PASSWORD = "HiLLonden1!!";
 
-  // Load users from localStorage or initialize with admin user
+  // Status options list & their class names for color coding
+  const STATUS_OPTIONS = [
+    {value: "New", className: "status-New"},
+    {value: "Authorised", className: "status-Authorised"},
+    {value: "Pending Investigation", className: "status-Pending"},
+    {value: "Denied", className: "status-Denied"},
+  ];
+
+  // Load users from localStorage or initialize admin user
   function loadUsers() {
     let users = JSON.parse(localStorage.getItem("users"));
     if (!users) {
@@ -157,10 +192,21 @@
     }
     return users;
   }
-
-  // Save users to localStorage
   function saveUsers(users) {
     localStorage.setItem("users", JSON.stringify(users));
+  }
+
+  // Load cases and their statuses
+  function loadCases() {
+    let cases = JSON.parse(localStorage.getItem("cases"));
+    if (!cases) {
+      cases = {};
+      localStorage.setItem("cases", JSON.stringify(cases));
+    }
+    return cases;
+  }
+  function saveCases(cases) {
+    localStorage.setItem("cases", JSON.stringify(cases));
   }
 
   const loginBox = document.getElementById("loginBox");
@@ -175,7 +221,7 @@
 
   let currentUser = null;
 
-  // Check if user is logged in
+  // Check if logged in
   function checkLogin() {
     const user = localStorage.getItem("loggedInUser");
     if (user) {
@@ -185,23 +231,30 @@
     return false;
   }
 
-  // Render cases
+  // Render all cases with status dropdown
   function renderCases() {
     casesList.innerHTML = "";
-    let reports = JSON.parse(localStorage.getItem("htmlReports") || "{}");
-    let keys = Object.keys(reports);
+    const cases = loadCases();
 
+    const keys = Object.keys(cases);
     if (keys.length === 0) {
       casesList.innerHTML = "<li>No cases found.</li>";
       return;
     }
 
     keys.forEach(key => {
-      const reportHTML = reports[key];
+      const caseData = cases[key];
+      // caseData should be { html: "...", status: "New" }
+      const reportHTML = caseData.html;
+      const status = caseData.status || "New";
+
+      // Extract suspect name from HTML title
       const nameMatch = reportHTML.match(/<title>Arrest Report - (.*?)<\/title>/i);
       const suspectName = nameMatch ? nameMatch[1] : "Unknown Suspect";
 
       const li = document.createElement("li");
+
+      // Link to view case in new tab
       const a = document.createElement("a");
       a.textContent = `View Case: ${suspectName}`;
       a.href = "#";
@@ -211,12 +264,44 @@
         window.open(url, "_blank");
         return false;
       };
+
+      // Status dropdown
+      const select = document.createElement("select");
+      select.className = "status-select";
+
+      STATUS_OPTIONS.forEach(opt => {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.textContent = opt.value;
+        if (opt.value === status) option.selected = true;
+        select.appendChild(option);
+      });
+
+      // Set status select color class
+      function updateSelectClass() {
+        STATUS_OPTIONS.forEach(opt => {
+          select.classList.remove(opt.className);
+        });
+        const found = STATUS_OPTIONS.find(o => o.value === select.value);
+        if (found) select.classList.add(found.className);
+      }
+      updateSelectClass();
+
+      // When status changes, update storage
+      select.addEventListener("change", () => {
+        const newStatus = select.value;
+        cases[key].status = newStatus;
+        saveCases(cases);
+        updateSelectClass();
+      });
+
       li.appendChild(a);
+      li.appendChild(select);
       casesList.appendChild(li);
     });
   }
 
-  // Handle login form submit
+  // Handle login submit
   loginForm.addEventListener("submit", e => {
     e.preventDefault();
     loginError.style.display = "none";
@@ -233,14 +318,13 @@
       caseBox.style.display = "block";
       renderCases();
 
-      // Show Add User section only if logged in as admin
       if (username === ADMIN_USERNAME) {
         addUserSection.style.display = "block";
       } else {
         addUserSection.style.display = "none";
       }
     } else {
-      loginError.textContent = "Invalid username or password";
+      loginError.textContent = "Invalid username or password.";
       loginError.style.display = "block";
     }
   });
@@ -249,10 +333,10 @@
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("loggedInUser");
     currentUser = null;
-    loginBox.style.display = "block";
     caseBox.style.display = "none";
-    addUserSuccess.style.display = "none";
-    addUserForm.reset();
+    loginBox.style.display = "block";
+    loginForm.reset();
+    loginError.style.display = "none";
   });
 
   // Handle add user form submit
@@ -263,28 +347,27 @@
     const newUsername = e.target.newUsername.value.trim();
     const newPassword = e.target.newPassword.value.trim();
 
-    if (!newUsername || !newPassword) {
-      return;
-    }
+    if (!newUsername || !newPassword) return;
 
     const users = loadUsers();
-
     if (users[newUsername]) {
       alert("User already exists!");
       return;
     }
-
     users[newUsername] = newPassword;
     saveUsers(users);
 
     addUserSuccess.style.display = "block";
     addUserForm.reset();
+
+    // Hide success message after 3 seconds
+    setTimeout(() => {
+      addUserSuccess.style.display = "none";
+    }, 3000);
   });
 
-  // On page load
+  // On page load, check login state
   window.onload = () => {
-    loadUsers(); // Ensure users initialized
-
     if (checkLogin()) {
       loginBox.style.display = "none";
       caseBox.style.display = "block";
