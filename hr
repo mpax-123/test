@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label, input {
+            display: block;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        button {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>HR System</h1>
+
+    <!-- Employee Management -->
+    <h2>Employee Management</h2>
+    <form id="employeeForm">
+        <label for="employeeName">Employee Name:</label>
+        <input type="text" id="employeeName" required>
+        
+        <label for="discordUsername">Discord Username:</label>
+        <input type="text" id="discordUsername" required>
+        
+        <label for="robloxUsername">Roblox Username:</label>
+        <input type="text" id="robloxUsername" required>
+        
+        <label for="employeeRole">Employee Role:</label>
+        <input type="text" id="employeeRole" required>
+        
+        <button type="submit">Add Employee</button>
+    </form>
+
+    <h3>Employee List</h3>
+    <table id="employeeTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Discord Username</th>
+                <th>Roblox Username</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <!-- Leave Management -->
+    <h2>Leave Management</h2>
+    <form id="leaveForm">
+        <label for="leaveEmployee">Employee Name (Leave Request):</label>
+        <input type="text" id="leaveEmployee" required>
+        
+        <label for="leaveStart">Leave Start Date:</label>
+        <input type="date" id="leaveStart" required>
+        
+        <label for="leaveEnd">Leave End Date:</label>
+        <input type="date" id="leaveEnd" required>
+        
+        <button type="submit">Request Leave</button>
+    </form>
+
+    <h3>Leave Requests</h3>
+    <table id="leaveTable">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        // Employee Management
+        const employeeForm = document.getElementById('employeeForm');
+        const employeeTable = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
+
+        employeeForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('employeeName').value;
+            const discord = document.getElementById('discordUsername').value;
+            const roblox = document.getElementById('robloxUsername').value;
+            const role = document.getElementById('employeeRole').value;
+
+            const newRow = employeeTable.insertRow();
+            newRow.innerHTML = `
+                <td>${name}</td>
+                <td>${discord}</td>
+                <td>${roblox}</td>
+                <td>${role}</td>
+            `;
+
+            // Clear form
+            employeeForm.reset();
+        });
+
+        // Leave Management
+        const leaveForm = document.getElementById('leaveForm');
+        const leaveTable = document.getElementById('leaveTable').getElementsByTagName('tbody')[0];
+
+        leaveForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const employee = document.getElementById('leaveEmployee').value;
+            const startDate = document.getElementById('leaveStart').value;
+            const endDate = document.getElementById('leaveEnd').value;
+
+            const newLeaveRow = leaveTable.insertRow();
+            newLeaveRow.innerHTML = `
+                <td>${employee}</td>
+                <td>${startDate}</td>
+                <td>${endDate}</td>
+            `;
+
+            // Clear form
+            leaveForm.reset();
+        });
+    </script>
+</body>
+</html>
