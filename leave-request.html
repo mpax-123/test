@@ -98,41 +98,50 @@
 </div>
 
 <script>
-    document.getElementById('leaveRequestForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
+  document.getElementById('leaveRequestForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
 
-        // Collect form data
-        const formData = {
-            name: document.getElementById('name').value,
-            role: document.getElementById('role').value,
-            startDate: document.getElementById('startDate').value,
-            finishDate: document.getElementById('finishDate').value,
-            reason: document.getElementById('reason').value
-        };
+    // Collect form data
+    const formData = {
+        name: document.getElementById('name').value,
+        role: document.getElementById('role').value,
+        startDate: document.getElementById('startDate').value,
+        finishDate: document.getElementById('finishDate').value,
+        reason: document.getElementById('reason').value
+    };
 
-        // Format the message to send to Discord
-        const discordMessage = {
-            content: `Leave Request:\n- **Name:** ${formData.name}\n- **Role:** ${formData.role}\n- **Start Date:** ${formData.startDate}\n- **Finish Date:** ${formData.finishDate}\n- **Reason:** ${formData.reason}`
-        };
+    // Format the message to send to Discord
+    const discordMessage = {
+        content: `Leave Request:\n- **Name:** ${formData.name}\n- **Role:** ${formData.role}\n- **Start Date:** ${formData.startDate}\n- **Finish Date:** ${formData.finishDate}\n- **Reason:** ${formData.reason}`
+    };
 
-        // Send the data to the Discord webhook
-        fetch('https://discord.com/api/webhooks/1406617433028169748/xftZIetzj31WwXo-PHjERm-_RD8TULa885IbXjran-jdwh1VhE6UlLYE9a5HnyEVW0_j', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(discordMessage)
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert('Leave request sent successfully!');
-            document.getElementById('leaveRequestForm').reset();
-        })
-        .catch(error => {
-            alert('Error submitting request!');
-            console.error('Error:', error);
-        });
+    // Log data before sending to Discord
+    console.log('Sending the following data to Discord:', discordMessage);
+
+    // Send the data to the Discord webhook
+    fetch('https://discord.com/api/webhooks/1406617433028169748/xftZIetzj31WwXo-PHjERm-_RD8TULa885IbXjran-jdwh1VhE6UlLYE9a5HnyEVW0_j', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(discordMessage)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text(); // Read response as text to avoid JSON parsing issues
+    })
+    .then(data => {
+        console.log('Success:', data);
+        alert('Leave request sent successfully!');
+        document.getElementById('leaveRequestForm').reset();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error submitting request!');
     });
+});
 </script>
 
 </body>
