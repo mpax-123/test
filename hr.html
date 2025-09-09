@@ -3,155 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR System</title>
+    <title>Modern HR System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1 {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
             color: #333;
         }
+
+        header {
+            background-color: #2d3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1, h2 {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        main {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
         form {
-            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        label, input {
+
+        form h2 {
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 5px;
             display: block;
-            margin: 10px 0;
         }
-        table {
+
+        input, button {
             width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-        table, th, td {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
             border: 1px solid #ddd;
         }
-        th, td {
-            padding: 10px;
-            text-align: left;
+
+        input:focus, button:focus {
+            outline: none;
+            border-color: #4CAF50;
         }
+
         button {
-            padding: 8px 12px;
             background-color: #4CAF50;
             color: white;
-            border: none;
             cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
+        .responsive-table {
+            overflow-x: auto;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        .status {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
     </style>
 </head>
 <body>
-    <h1>HR System</h1>
 
-    <!-- Employee Management -->
-    <h2>Employee Management</h2>
-    <form id="employeeForm">
-        <label for="employeeName">Employee Name:</label>
-        <input type="text" id="employeeName" required>
-        
-        <label for="discordUsername">Discord Username:</label>
-        <input type="text" id="discordUsername" required>
-        
-        <label for="robloxUsername">Roblox Username:</label>
-        <input type="text" id="robloxUsername" required>
-        
-        <label for="employeeRole">Employee Role:</label>
-        <input type="text" id="employeeRole" required>
-        
-        <button type="submit">Add Employee</button>
-    </form>
+<header>
+    <h1>HR System - Employee & Leave Management</h1>
+</header>
 
-    <h3>Employee List</h3>
-    <table id="employeeTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Discord Username</th>
-                <th>Roblox Username</th>
-                <th>Role</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<main>
+    <!-- Employee Management Section -->
+    <section>
+        <form id="employeeForm">
+            <h2>Add New Employee</h2>
+            <label for="employeeName">Employee Name:</label>
+            <input type="text" id="employeeName" required>
 
-    <!-- Leave Management -->
-    <h2>Leave Management</h2>
-    <form id="leaveForm">
-        <label for="leaveEmployee">Employee Name (Leave Request):</label>
-        <input type="text" id="leaveEmployee" required>
-        
-        <label for="leaveStart">Leave Start Date:</label>
-        <input type="date" id="leaveStart" required>
-        
-        <label for="leaveEnd">Leave End Date:</label>
-        <input type="date" id="leaveEnd" required>
-        
-        <button type="submit">Request Leave</button>
-    </form>
+            <label for="discordUsername">Discord Username:</label>
+            <input type="text" id="discordUsername" required>
 
-    <h3>Leave Requests</h3>
-    <table id="leaveTable">
-        <thead>
-            <tr>
-                <th>Employee Name</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+            <label for="robloxUsername">Roblox Username:</label>
+            <input type="text" id="robloxUsername" required>
 
-    <script>
-        // Employee Management
-        const employeeForm = document.getElementById('employeeForm');
-        const employeeTable = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
+            <label for="employeeRole">Employee Role:</label>
+            <input type="text" id="employeeRole" required>
 
-        employeeForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+            <button type="submit">Add Employee</button>
+            <div class="error-message" id="employeeError"></div>
+        </form>
 
-            const name = document.getElementById('employeeName').value;
-            const discord = document.getElementById('discordUsername').value;
-            const roblox = document.getElementById('robloxUsername').value;
-            const role = document.getElementById('employeeRole').value;
+        <h3>Employee List</h3>
+        <div class="responsive-table">
+            <table id="employeeTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Discord Username</th>
+                        <th>Roblox Username</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
 
-            const newRow = employeeTable.insertRow();
-            newRow.innerHTML = `
-                <td>${name}</td>
-                <td>${discord}</td>
-                <td>${roblox}</td>
-                <td>${role}</td>
-            `;
+    <!-- Leave Management Section -->
+    <section>
+        <form id="leaveForm">
+            <h2>Leave Request</h2>
+            <label for="leaveEmployee">Employee Name (Leave Request):</label>
+            <input type="text" id="leaveEmployee" required>
 
-            // Clear form
-            employeeForm.reset();
-        });
+            <label for="leaveStart">Leave Start Date:</label>
+            <input type="date" id="leaveStart" required>
 
-        // Leave Management
-        const leaveForm = document.getElementById('leaveForm');
-        const leaveTable = document.getElementById('leaveTable').getElementsByTagName('tbody')[0];
+            <label for="leaveEnd">Leave End Date:</label>
+            <input type="date" id="leaveEnd" required>
 
-        leaveForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+            <button type="submit">Submit Leave Request</button>
+            <div class="error-message" id="leaveError"></div>
+        </form>
 
-            const employee = document.getElementById('leaveEmployee').value;
-            const startDate = document.getElementById('leaveStart').value;
-            const endDate = document.getElementById('leaveEnd').value;
+        <h3>Leave Requests</h3>
+        <div class="responsive-table">
+            <table id="leaveTable">
+                <thead>
+                    <tr>
+                        <th>Employee Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+</main>
 
-            const newLeaveRow = leaveTable.insertRow();
-            newLeaveRow.innerHTML = `
-                <td>${employee}</td>
-                <td>${startDate}</td>
-                <td>${endDate}</td>
-            `;
+<script>
+    // Employee Management
+    const employeeForm = document.getElementById('employeeForm');
+    const employeeTable = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
+    const employeeError = document.getElementById('employeeError');
 
-            // Clear form
-            leaveForm.reset();
-        });
-    </script>
+    employeeForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('employeeName').value;
+        const discord = document.getElementById('discordUsername').value;
+        const roblox = document.getElementById('robloxUsername').value;
+        const role = document.getElementById('employeeRole').value;
+
+        // Simple validation
+        if (!name || !discord || !roblox || !role) {
+            employeeError.textContent = "All fields are required!";
+            return;
+        }
+
+        employeeError.textContent = ''; // Clear error message
+
+        const newRow = employeeTable.insertRow();
+        newRow.innerHTML = `
+            <td>${name}</td>
+            <td>${discord}</td>
+            <td>${roblox}</td>
+            <td>${role}</td>
+        `;
+
+        // Clear form
+        employeeForm.reset();
+    });
+
+    // Leave Management
+    const leaveForm = document.getElementById('leaveForm');
+    const leaveTable = document.getElementById('leaveTable').getElementsByTagName('tbody')[0];
+    const leaveError = document.getElementById('leaveError');
+
+    leaveForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const employee = document.getElementById('leaveEmployee').value;
+        const startDate = document.getElementById('leaveStart').value;
+        const endDate = document.getElementById('leaveEnd').value;
+
+        // Simple validation
+        if (!employee || !startDate || !endDate) {
+            leaveError.textContent = "All fields are required!";
+            return;
+        }
+
+        leaveError.textContent = ''; // Clear error message
+
+        const newLeaveRow = leaveTable.insertRow();
+        newLeaveRow.innerHTML = `
+            <td>${employee}</td>
+            <td>${startDate}</td>
+            <td>${endDate}</td>
+        `;
+
+        // Clear form
+        leaveForm.reset();
+    });
+</script>
+
 </body>
 </html>
