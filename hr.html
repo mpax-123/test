@@ -198,7 +198,7 @@
     const employeeTable = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
     const employeeError = document.getElementById('employeeError');
 
-    employeeForm.addEventListener('submit', function(event) {
+    employeeForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const name = document.getElementById('employeeName').value;
@@ -222,6 +222,17 @@
             <td>${role}</td>
         `;
 
+        // Send to backend to trigger Discord webhook
+        const response = await fetch('http://localhost:5000/employees', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, discordUsername: discord, robloxUsername: roblox, role }),
+        });
+
+        const data = await response.json();
+
         // Clear form
         employeeForm.reset();
     });
@@ -231,7 +242,7 @@
     const leaveTable = document.getElementById('leaveTable').getElementsByTagName('tbody')[0];
     const leaveError = document.getElementById('leaveError');
 
-    leaveForm.addEventListener('submit', function(event) {
+    leaveForm.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const employee = document.getElementById('leaveEmployee').value;
@@ -252,6 +263,17 @@
             <td>${startDate}</td>
             <td>${endDate}</td>
         `;
+
+        // Send to backend to trigger Discord webhook
+        const response = await fetch('http://localhost:5000/leave-requests', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ employeeName: employee, startDate, endDate }),
+        });
+
+        const data = await response.json();
 
         // Clear form
         leaveForm.reset();
